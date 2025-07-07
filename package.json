@@ -11,6 +11,6 @@
     "@fingerprintjs/fingerprintjs": "^4.6.2"
   },
   "devDependencies": {
-    "esbuild": "^0.17.19"
+    "esbuild": "^0.25.5"
   }
 }

@@ -1,4 +1,6 @@
 const esbuild = require('esbuild');
+const fs = require('fs');
+const path = require('path');
 
 esbuild.build({
   entryPoints: ['main.js'],
@@ -7,5 +9,9 @@ esbuild.build({
   minify: true,
   sourcemap: true,
   target: ['es2017'],
-  platform: 'browser',
-}).catch(() => process.exit(1));
+  platform: 'browser'
+}).then(() => {
+  fs.mkdirSync('dist', { recursive: true });
+  fs.copyFileSync('index.html', path.join('dist', 'index.html'));
+  if (fs.existsSync('CNAME')) fs.copyFileSync('CNAME', path.join('dist', 'CNAME'));
+});
