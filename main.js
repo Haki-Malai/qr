@@ -1,18 +1,24 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import quotesLib from 'success-motivational-quotes';
 
-const urls = [
-  'https://www.youtube.com/watch?v=dQw4w9gXcQ'
-];
+async function sha256Hex (str) {
+  const data = new TextEncoder().encode(str);
+  const buf  = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)]
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export async function showMotivationalQuote () {
+  const fp = await FingerprintJS.load();
+  const { visitorId } = await fp.get();
+  const quotes = quotesLib.getAllQuotes();
+  const hex    = await sha256Hex(visitorId);
+  const idx    = parseInt(hex.slice(0, 8), 16) % quotes.length;
+  const q      = quotes[idx];
+  alert(`${q.body} — ${q.by}`);
+}
 
 (async () => {
-  const fp = await FingerprintJS.load();
-
-  const result = await fp.get();
-
-  const visitorId = result.visitorId;
-
-  alert(`Visitor ID: ${visitorId}`);
-
-  const target = urls[Math.floor(Math.random() * urls.length)];
-  window.location.replace(target);
+  await showMotivationalQuote();
 })();

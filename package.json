@@ -4,11 +4,12 @@
   "description": "Project to redirect with visitor fingerprint alert",
   "main": "main.js",
   "scripts": {
-    "start": "serve .",
+    "start": "node build.js && npx serve dist -l 5000",
     "build": "node build.js"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^4.6.2"
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "success-motivational-quotes": "^1.0.8"
   },
   "devDependencies": {
     "esbuild": "^0.25.5"
