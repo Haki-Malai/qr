@@ -1,0 +1,16 @@
+{
+  "name": "qr-project",
+  "version": "1.0.0",
+  "description": "Project to redirect with visitor fingerprint alert",
+  "main": "main.js",
+  "scripts": {
+    "start": "serve .",
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.12.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.19"
+  }
+}
