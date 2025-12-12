@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import quotesLib from 'success-motivational-quotes';
 import stringHash from 'string-hash';
+import { DEPLOY_VERSION, VERSION_CONFIG } from '../version.config';
 
 type Quote = { body: string; by: string };
 
@@ -15,6 +16,14 @@ export default function App() {
   const [quote, setQuote] = useState<Quote | null>(null);
 
   useEffect(() => {
+    // Check if current version is a redirect
+    const config = VERSION_CONFIG[DEPLOY_VERSION];
+    if (config.type === 'redirect') {
+      window.location.href = config.url;
+      return;
+    }
+
+    // Otherwise, load the motivational quote app
     (async () => {
       const fp = await FingerprintJS.load();
       const { visitorId } = await fp.get();

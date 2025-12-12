@@ -4,6 +4,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      deploy_version:
+        description: 'Deploy Version'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
 
 permissions:
   contents: read
@@ -23,6 +33,10 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - name: Set deploy version
+        run: |
+          VERSION=${{ github.event.inputs.deploy_version || '1' }}
+          sed -i "s/export const DEPLOY_VERSION: 1 | 2 | 3 = [0-9];/export const DEPLOY_VERSION: 1 | 2 | 3 = $VERSION;/" version.config.ts
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
