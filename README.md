@@ -18,6 +18,9 @@ npm run prepare:deploy-config
 Useful variants:
 
 ```bash
+DEPLOY_VERSION='auto - infer from redirect_target' REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
+DEPLOY_VERSION='quotes - deploy the motivational quotes app' npm run prepare:deploy-config
+DEPLOY_VERSION='redirect - deploy the redirect app' REDIRECT_TARGET=middlefinger_monkey.jpg npm run prepare:deploy-config
 REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
 REDIRECT_TARGET=middlefinger_monkey.jpg npm run prepare:deploy-config
 REDIRECT_TARGET=monkeys/middlefinger_monkey.jpg npm run prepare:deploy-config

@@ -58,11 +58,22 @@ test('accepts a reachable external URL after HEAD falls back to GET', async () =
 test('defaults to version 2 when a redirect target is provided without an explicit version', () => {
   assert.equal(resolveRequestedVersion(undefined, 'https://example.com'), 2);
   assert.equal(resolveRequestedVersion('', 'monkeys/middlefinger_monkey.jpg'), 2);
+  assert.equal(resolveRequestedVersion('auto', 'https://example.com'), 2);
+  assert.equal(resolveRequestedVersion('auto - infer from redirect_target', 'middlefinger_monkey.jpg'), 2);
 });
 
 test('defaults to version 1 when no explicit version or redirect target is provided', () => {
   assert.equal(resolveRequestedVersion(undefined, ''), 1);
   assert.equal(resolveRequestedVersion('   ', '   '), 1);
+  assert.equal(resolveRequestedVersion('auto', ''), 1);
+  assert.equal(resolveRequestedVersion('auto - infer from redirect_target', ''), 1);
+});
+
+test('respects explicit descriptive deploy mode labels', () => {
+  assert.equal(resolveRequestedVersion('quotes', 'https://example.com'), 1);
+  assert.equal(resolveRequestedVersion('quotes - deploy the motivational quotes app', ''), 1);
+  assert.equal(resolveRequestedVersion('redirect', ''), 2);
+  assert.equal(resolveRequestedVersion('redirect - deploy the redirect app', ''), 2);
 });
 
 test('rejects an external URL when both HEAD and GET fail validation', async () => {

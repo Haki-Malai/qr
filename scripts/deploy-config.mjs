@@ -4,6 +4,9 @@ import path from 'node:path';
 export const DEFAULT_REDIRECT_ASSET_PATH = 'monkeys/middlefinger_monkey.jpg';
 export const DEFAULT_REDIRECT_TARGET = '/redirect-assets/monkeys/middlefinger_monkey.jpg';
 export const REDIRECT_ASSET_DIRNAME = 'redirect-assets';
+export const DEPLOY_MODE_AUTO = 'auto';
+export const DEPLOY_MODE_QUOTES = 'quotes';
+export const DEPLOY_MODE_REDIRECT = 'redirect';
 
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -31,6 +34,23 @@ export function parseDeployVersion(value) {
 
 export function resolveRequestedVersion(version, redirectTargetInput = '') {
   if (version !== undefined && version !== null && String(version).trim() !== '') {
+    const normalizedValue = String(version).trim().toLowerCase();
+
+    if (normalizedValue === DEPLOY_MODE_AUTO || normalizedValue.startsWith(`${DEPLOY_MODE_AUTO} `)) {
+      return redirectTargetInput.trim() ? 2 : 1;
+    }
+
+    if (normalizedValue === DEPLOY_MODE_QUOTES || normalizedValue.startsWith(`${DEPLOY_MODE_QUOTES} `)) {
+      return 1;
+    }
+
+    if (
+      normalizedValue === DEPLOY_MODE_REDIRECT ||
+      normalizedValue.startsWith(`${DEPLOY_MODE_REDIRECT} `)
+    ) {
+      return 2;
+    }
+
     return parseDeployVersion(version);
   }
 
