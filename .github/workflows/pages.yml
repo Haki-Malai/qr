@@ -5,16 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      deploy_version:
-        description: 'Deploy Version'
-        required: true
-        default: '1'
-        type: choice
-        options:
-          - '1'
-          - '2'
       redirect_target:
-        description: 'Optional redirect target URL or file path under public/redirect-assets'
+        description: 'Optional redirect target URL or file path under public/redirect-assets. When set, the workflow deploys version 2.'
         required: false
         default: ''
         type: string
@@ -39,7 +31,6 @@ jobs:
       - run: npm ci
       - name: Prepare deploy config
         env:
-          DEPLOY_VERSION: ${{ github.event.inputs.deploy_version || '1' }}
           REDIRECT_TARGET: ${{ github.event.inputs.redirect_target || '' }}
         run: node scripts/prepare-deploy-config.mjs
       - run: npm run build

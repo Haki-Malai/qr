@@ -29,6 +29,14 @@ export function parseDeployVersion(value) {
   return version;
 }
 
+export function resolveRequestedVersion(version, redirectTargetInput = '') {
+  if (version !== undefined && version !== null && String(version).trim() !== '') {
+    return parseDeployVersion(version);
+  }
+
+  return redirectTargetInput.trim() ? 2 : 1;
+}
+
 export function parseDeployConfig(value) {
   if (!isPlainObject(value) || typeof value.version !== 'number' || typeof value.mode !== 'string') {
     return null;
@@ -213,7 +221,7 @@ export async function resolveDeployConfig({
   siteOrigin,
   fetchImpl = fetch,
 }) {
-  const deployVersion = parseDeployVersion(version);
+  const deployVersion = resolveRequestedVersion(version, redirectTargetInput);
 
   if (deployVersion === 1) {
     return { version: 1, mode: 'quotes' };

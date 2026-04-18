@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REDIRECT_TARGET, resolveDeployConfig } from './deploy-config.mjs';
+import { DEFAULT_REDIRECT_TARGET, resolveDeployConfig, resolveRequestedVersion } from './deploy-config.mjs';
 
 async function makePublicDir() {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qr-deploy-config-'));
@@ -53,6 +53,16 @@ test('accepts a reachable external URL after HEAD falls back to GET', async () =
     });
     assert.deepEqual(calls, ['HEAD', 'GET']);
   });
+});
+
+test('defaults to version 2 when a redirect target is provided without an explicit version', () => {
+  assert.equal(resolveRequestedVersion(undefined, 'https://example.com'), 2);
+  assert.equal(resolveRequestedVersion('', 'monkeys/middlefinger_monkey.jpg'), 2);
+});
+
+test('defaults to version 1 when no explicit version or redirect target is provided', () => {
+  assert.equal(resolveRequestedVersion(undefined, ''), 1);
+  assert.equal(resolveRequestedVersion('   ', '   '), 1);
 });
 
 test('rejects an external URL when both HEAD and GET fail validation', async () => {

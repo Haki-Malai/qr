@@ -28,7 +28,7 @@ async function deriveSiteOrigin() {
 
 async function main() {
   const config = await resolveDeployConfig({
-    version: process.env.DEPLOY_VERSION ?? '1',
+    version: process.env.DEPLOY_VERSION,
     redirectTargetInput: process.env.REDIRECT_TARGET ?? '',
     publicDir,
     siteOrigin: await deriveSiteOrigin(),

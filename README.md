@@ -18,8 +18,9 @@ npm run prepare:deploy-config
 Useful variants:
 
 ```bash
-DEPLOY_VERSION=2 REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
-DEPLOY_VERSION=2 REDIRECT_TARGET=monkeys/middlefinger_monkey.jpg npm run prepare:deploy-config
+REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
+REDIRECT_TARGET=monkeys/middlefinger_monkey.jpg npm run prepare:deploy-config
+DEPLOY_VERSION=2 npm run prepare:deploy-config
 ```
 
 Run tests with:
