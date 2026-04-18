@@ -64,6 +64,34 @@ test('accepts a reachable external URL after HEAD falls back to GET', async () =
   });
 });
 
+test('accepts a bare domain by normalizing it to https before validation', async () => {
+  await withPublicDir(async (publicDir) => {
+    const seenUrls = [];
+    const fetchImpl = async (url, options = {}) => {
+      seenUrls.push({ url, method: options.method ?? 'GET' });
+
+      if ((options.method ?? 'GET') === 'HEAD') {
+        return new Response(null, { status: 301 });
+      }
+
+      return new Response(null, { status: 200 });
+    };
+
+    const config = await resolveDeployConfig({
+      redirectTargetInput: 'hakimalai.com',
+      publicDir,
+      fetchImpl,
+    });
+
+    assert.deepEqual(config, {
+      mode: 'redirect',
+      redirectTarget: 'https://hakimalai.com/',
+      redirectTargetKind: 'url',
+    });
+    assert.equal(seenUrls[0]?.url, 'https://hakimalai.com/');
+  });
+});
+
 test('rejects an invalid URL-like string before any reachability check', async () => {
   await withPublicDir(async (publicDir) => {
     await assert.rejects(

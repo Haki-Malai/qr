@@ -3,7 +3,7 @@
 Static Vite app with one deploy flow:
 
 - leave `redirect_target` empty to deploy deterministic motivational quotes
-- set `redirect_target` to a valid reachable `http(s)` URL to deploy a redirect there
+- set `redirect_target` to a valid reachable `http(s)` URL, or a bare domain like `hakimalai.com`, to deploy a redirect there
 - set `redirect_target` to plain text like `%monkey%` to deploy a redirect to the first matching image under `public/redirect-assets`
 
 ## Deploy config
@@ -21,6 +21,7 @@ Useful variants:
 ```bash
 REDIRECT_TARGET='' npm run prepare:deploy-config
 REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
+REDIRECT_TARGET=hakimalai.com npm run prepare:deploy-config
 REDIRECT_TARGET=%monkey% npm run prepare:deploy-config
 REDIRECT_TARGET=middlefinger_monkey npm run prepare:deploy-config
 ```

@@ -14,6 +14,9 @@ export const IMAGE_EXTENSIONS = new Set([
   '.webp',
 ]);
 
+const DOMAIN_LIKE_INPUT_PATTERN =
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}(?::\d{1,5})?(?:[/?#].*)?$/i;
+
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -143,19 +146,34 @@ export async function resolveImageSearchRedirectTarget(searchText, publicDir) {
 export function parseHttpUrl(input) {
   const trimmed = input.trim();
 
-  if (!/^https?:\/\//i.test(trimmed)) {
+  if (/^https?:\/\//i.test(trimmed)) {
+    let url;
+
+    try {
+      url = new URL(trimmed);
+    } catch {
+      throw new Error(`"${trimmed}" is not a valid HTTP(S) URL.`);
+    }
+
+    if ((url.protocol !== 'http:' && url.protocol !== 'https:') || !url.hostname) {
+      throw new Error(`"${trimmed}" is not a valid HTTP(S) URL.`);
+    }
+
+    return url.toString();
+  }
+
+  if (!DOMAIN_LIKE_INPUT_PATTERN.test(trimmed)) {
     return null;
   }
 
   let url;
-
   try {
-    url = new URL(trimmed);
+    url = new URL(`https://${trimmed}`);
   } catch {
     throw new Error(`"${trimmed}" is not a valid HTTP(S) URL.`);
   }
 
-  if ((url.protocol !== 'http:' && url.protocol !== 'https:') || !url.hostname) {
+  if (url.protocol !== 'https:' || !url.hostname) {
     throw new Error(`"${trimmed}" is not a valid HTTP(S) URL.`);
   }
 
