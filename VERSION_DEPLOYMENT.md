@@ -13,6 +13,7 @@ This project supports two deployment versions through GitHub Actions.
 5. Optional: fill in `redirect_target`.
    - `https://...` or `http://...` is validated with `HEAD`, then `GET` if needed.
    - Any other value is treated as a file path relative to `public/redirect-assets`.
+   - A bare filename is accepted when it matches exactly one file anywhere under `public/redirect-assets`.
    - Subfolders are supported, for example `monkeys/middlefinger_monkey.jpg`.
    - Absolute paths and `..` are rejected.
 6. Click **Run workflow**.
@@ -37,6 +38,7 @@ Generate the runtime config first:
 ```bash
 npm run prepare:deploy-config
 REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
+REDIRECT_TARGET=middlefinger_monkey.jpg npm run prepare:deploy-config
 REDIRECT_TARGET=monkeys/middlefinger_monkey.jpg npm run prepare:deploy-config
 DEPLOY_VERSION=2 npm run prepare:deploy-config
 ```

@@ -105,6 +105,23 @@ test('accepts a nested redirect file path under public/redirect-assets', async (
   });
 });
 
+test('accepts a bare filename when it uniquely exists under public/redirect-assets', async () => {
+  await withPublicDir(async (publicDir) => {
+    const config = await resolveDeployConfig({
+      version: 2,
+      redirectTargetInput: 'middlefinger_monkey.jpg',
+      publicDir,
+    });
+
+    assert.deepEqual(config, {
+      version: 2,
+      mode: 'redirect',
+      redirectTarget: '/redirect-assets/monkeys/middlefinger_monkey.jpg',
+      redirectTargetKind: 'file',
+    });
+  });
+});
+
 test('rejects a missing redirect file path', async () => {
   await withPublicDir(async (publicDir) => {
     await assert.rejects(
@@ -114,6 +131,25 @@ test('rejects a missing redirect file path', async () => {
         publicDir,
       }),
       /does not exist/i,
+    );
+  });
+});
+
+test('rejects an ambiguous bare filename under public/redirect-assets', async () => {
+  await withPublicDir(async (publicDir) => {
+    await fs.mkdir(path.join(publicDir, 'redirect-assets', 'other-monkeys'), { recursive: true });
+    await fs.writeFile(
+      path.join(publicDir, 'redirect-assets', 'other-monkeys', 'middlefinger_monkey.jpg'),
+      'image',
+    );
+
+    await assert.rejects(
+      resolveDeployConfig({
+        version: 2,
+        redirectTargetInput: 'middlefinger_monkey.jpg',
+        publicDir,
+      }),
+      /ambiguous/i,
     );
   });
 });

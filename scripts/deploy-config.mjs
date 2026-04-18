@@ -102,41 +102,81 @@ function encodePathSegments(relativePath) {
     .join('/');
 }
 
-export async function resolveFileRedirectTarget(relativePath, publicDir) {
-  const sanitizedPath = sanitizeRedirectAssetPath(relativePath);
-  const assetRoot = path.resolve(publicDir, REDIRECT_ASSET_DIRNAME);
-  const absolutePath = path.resolve(assetRoot, sanitizedPath);
-  const relativeToRoot = path.relative(assetRoot, absolutePath);
+async function findAssetMatchesByBasename(assetRoot, basename, currentDir = assetRoot) {
+  const entries = await fs.readdir(currentDir, { withFileTypes: true });
+  const matches = [];
+
+  for (const entry of entries) {
+    const entryPath = path.join(currentDir, entry.name);
+
+    if (entry.isDirectory()) {
+      matches.push(...(await findAssetMatchesByBasename(assetRoot, basename, entryPath)));
+      continue;
+    }
+
+    if (entry.isFile() && entry.name === basename) {
+      matches.push(path.relative(assetRoot, entryPath).split(path.sep).join('/'));
+    }
+  }
+
+  return matches;
+}
+
+async function resolveAssetRelativePath(sanitizedPath, assetRoot) {
+  const directAbsolutePath = path.resolve(assetRoot, sanitizedPath);
+  const directRelativePath = path.relative(assetRoot, directAbsolutePath);
 
   if (
-    relativeToRoot === '' ||
-    relativeToRoot === '..' ||
-    relativeToRoot.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativeToRoot)
+    directRelativePath === '' ||
+    directRelativePath === '..' ||
+    directRelativePath.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(directRelativePath)
   ) {
     throw new Error('Redirect file path must stay within public/redirect-assets.');
   }
 
-  let stats;
-
   try {
-    stats = await fs.stat(absolutePath);
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      throw new Error(`Redirect file "${sanitizedPath}" does not exist under public/redirect-assets.`);
+    const stats = await fs.stat(directAbsolutePath);
+
+    if (!stats.isFile()) {
+      throw new Error(`Redirect file "${sanitizedPath}" is not a file.`);
     }
 
-    throw error;
+    return sanitizedPath;
+  } catch (error) {
+    if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT') {
+      throw error;
+    }
   }
 
-  if (!stats.isFile()) {
-    throw new Error(`Redirect file "${sanitizedPath}" is not a file.`);
+  if (sanitizedPath.includes('/')) {
+    throw new Error(`Redirect file "${sanitizedPath}" does not exist under public/redirect-assets.`);
   }
+
+  const matches = await findAssetMatchesByBasename(assetRoot, sanitizedPath);
+
+  if (matches.length === 1) {
+    return matches[0];
+  }
+
+  if (matches.length > 1) {
+    throw new Error(
+      `Redirect file "${sanitizedPath}" is ambiguous under public/redirect-assets. Use a subfolder path.`,
+    );
+  }
+
+  throw new Error(`Redirect file "${sanitizedPath}" does not exist under public/redirect-assets.`);
+}
+
+export async function resolveFileRedirectTarget(relativePath, publicDir) {
+  const sanitizedPath = sanitizeRedirectAssetPath(relativePath);
+  const assetRoot = path.resolve(publicDir, REDIRECT_ASSET_DIRNAME);
+  const resolvedPath = await resolveAssetRelativePath(sanitizedPath, assetRoot);
 
   return {
     version: 2,
     mode: 'redirect',
-    redirectTarget: `/${REDIRECT_ASSET_DIRNAME}/${encodePathSegments(sanitizedPath)}`,
+    redirectTarget: `/${REDIRECT_ASSET_DIRNAME}/${encodePathSegments(resolvedPath)}`,
     redirectTargetKind: 'file',
   };
 }
