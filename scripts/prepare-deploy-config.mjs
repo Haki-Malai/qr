@@ -9,29 +9,10 @@ const repoRoot = path.resolve(scriptDir, '..');
 const publicDir = path.join(repoRoot, 'public');
 const deployConfigPath = path.join(publicDir, 'deploy-config.json');
 
-async function deriveSiteOrigin() {
-  if (process.env.SITE_ORIGIN?.trim()) {
-    return process.env.SITE_ORIGIN.trim();
-  }
-
-  try {
-    const cname = (await fs.readFile(path.join(publicDir, 'CNAME'), 'utf8')).trim();
-    return cname ? `https://${cname}` : undefined;
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      return undefined;
-    }
-
-    throw error;
-  }
-}
-
 async function main() {
   const config = await resolveDeployConfig({
-    version: process.env.DEPLOY_VERSION,
     redirectTargetInput: process.env.REDIRECT_TARGET ?? '',
     publicDir,
-    siteOrigin: await deriveSiteOrigin(),
   });
 
   await fs.writeFile(deployConfigPath, `${JSON.stringify(config, null, 2)}\n`);

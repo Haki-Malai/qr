@@ -1,9 +1,10 @@
 # qr
 
-Static Vite app with two deploy modes:
+Static Vite app with one deploy flow:
 
-- `1`: deterministic motivational quotes
-- `2`: validated redirect to either a reachable URL or a bundled file under `public/redirect-assets`
+- leave `redirect_target` empty to deploy deterministic motivational quotes
+- set `redirect_target` to a valid reachable `http(s)` URL to deploy a redirect there
+- set `redirect_target` to plain text like `%monkey%` to deploy a redirect to the first matching image under `public/redirect-assets`
 
 ## Deploy config
 
@@ -18,13 +19,10 @@ npm run prepare:deploy-config
 Useful variants:
 
 ```bash
-DEPLOY_VERSION='auto - infer from redirect_target' REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
-DEPLOY_VERSION='quotes - deploy the motivational quotes app' npm run prepare:deploy-config
-DEPLOY_VERSION='redirect - deploy the redirect app' REDIRECT_TARGET=middlefinger_monkey.jpg npm run prepare:deploy-config
+REDIRECT_TARGET='' npm run prepare:deploy-config
 REDIRECT_TARGET=https://example.com npm run prepare:deploy-config
-REDIRECT_TARGET=middlefinger_monkey.jpg npm run prepare:deploy-config
-REDIRECT_TARGET=monkeys/middlefinger_monkey.jpg npm run prepare:deploy-config
-DEPLOY_VERSION=2 npm run prepare:deploy-config
+REDIRECT_TARGET=%monkey% npm run prepare:deploy-config
+REDIRECT_TARGET=middlefinger_monkey npm run prepare:deploy-config
 ```
 
 Run tests with:

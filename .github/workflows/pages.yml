@@ -5,17 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      deploy_mode:
-        description: 'What should this deploy do?'
-        required: true
-        default: 'auto - infer from redirect_target'
-        type: choice
-        options:
-          - 'auto - infer from redirect_target'
-          - 'quotes - deploy the motivational quotes app'
-          - 'redirect - deploy the redirect app'
       redirect_target:
-        description: 'Optional redirect target URL or file path under public/redirect-assets.'
+        description: 'Leave empty for quotes. Use an http(s) URL to redirect there, or text like %monkey% to match the first image under public/redirect-assets.'
         required: false
         default: ''
         type: string
@@ -40,7 +31,6 @@ jobs:
       - run: npm ci
       - name: Prepare deploy config
         env:
-          DEPLOY_VERSION: ${{ github.event.inputs.deploy_mode || 'auto - infer from redirect_target' }}
           REDIRECT_TARGET: ${{ github.event.inputs.redirect_target || '' }}
         run: node scripts/prepare-deploy-config.mjs
       - run: npm run build

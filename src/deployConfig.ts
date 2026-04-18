@@ -1,7 +1,6 @@
 export type DeployConfig =
-  | { version: 1; mode: 'quotes' }
+  | { mode: 'quotes' }
   | {
-      version: 2;
       mode: 'redirect';
       redirectTarget: string;
       redirectTargetKind: 'url' | 'file';
@@ -22,24 +21,22 @@ function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
 }
 
 export function parseDeployConfig(value: unknown): DeployConfig | null {
-  if (!isPlainObject(value) || typeof value.version !== 'number' || typeof value.mode !== 'string') {
+  if (!isPlainObject(value) || typeof value.mode !== 'string') {
     return null;
   }
 
-  if (value.version === 1 && value.mode === 'quotes' && hasExactKeys(value, ['version', 'mode'])) {
-    return { version: 1, mode: 'quotes' };
+  if (value.mode === 'quotes' && hasExactKeys(value, ['mode'])) {
+    return { mode: 'quotes' };
   }
 
   if (
-    value.version === 2 &&
     value.mode === 'redirect' &&
     typeof value.redirectTarget === 'string' &&
     value.redirectTarget.length > 0 &&
     (value.redirectTargetKind === 'url' || value.redirectTargetKind === 'file') &&
-    hasExactKeys(value, ['version', 'mode', 'redirectTarget', 'redirectTargetKind'])
+    hasExactKeys(value, ['mode', 'redirectTarget', 'redirectTargetKind'])
   ) {
     return {
-      version: 2,
       mode: 'redirect',
       redirectTarget: value.redirectTarget,
       redirectTargetKind: value.redirectTargetKind,
