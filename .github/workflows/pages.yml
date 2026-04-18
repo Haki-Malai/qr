@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
     inputs:
       redirect_target:
-        description: 'Leave empty for quotes. Use an http(s) URL to redirect there, or text like %monkey% to match the first image under public/redirect-assets.'
         required: false
         default: ''
         type: string
